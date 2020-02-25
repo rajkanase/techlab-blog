@@ -25,4 +25,9 @@ user.pre('save', function (next) {
 
 })
 
+user.methods.comparePassword = (hash, password) => {
+    console.log(hash, password);
+    return bcrypt.compareSync(password, hash);
+}
+
 module.exports = mongoose.model('User', user);
