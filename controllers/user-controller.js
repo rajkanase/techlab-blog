@@ -1,4 +1,7 @@
 const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const secret = require("crypto").randomBytes(256).toString("hex");
+
 module.exports = {
 
     registerUser: (req, res) => {
@@ -16,6 +19,7 @@ module.exports = {
     },
 
     loginUser: (req, res) => {
+
         var user = req.body;
         User.findOne({ email: user.email }, (err, foundUSer) => {
             if (err) {
@@ -25,9 +29,10 @@ module.exports = {
                 if (foundUSer) {
                     let isPasswordValid = foundUSer.comparePassword(foundUSer.password, req.body.password);
                     console.log('isPasswordValid', isPasswordValid)
-                    
+
                     if (isPasswordValid) {
-                        res.status(200).json({ success: true, message: 'login success' });
+                        const token = jwt.sign({ userId: foundUSer._id }, secret, { expiresIn: '24h' });
+                        res.status(200).json({ success: true, message: 'login success', token: token });
                     } else {
                         res.status(500).json({ success: false, message: 'invalid password' });
                     }
